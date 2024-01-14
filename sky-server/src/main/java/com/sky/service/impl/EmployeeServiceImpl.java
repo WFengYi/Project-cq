@@ -1,11 +1,16 @@
 package com.sky.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.metadata.OrderItem;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeLoginDTO;
+import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
@@ -60,6 +65,41 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper,Employee> im
         return employee;
     }
 
+    /**
+     * 员工分页
+     *
+     * @param pageQueryDTO
+     * @return
+     */
+    @Override
+    public IPage<Employee> pageQuery(EmployeePageQueryDTO pageQueryDTO) {
+        //创建分页
+        Page<Employee> page = Page.of(pageQueryDTO.getPage(), pageQueryDTO.getPageSize());
+        //排序顺序
+        page.addOrder(new OrderItem("create_time",true));//根据那个字段，是否升序
+        //分页条件
+        QueryWrapper<Employee> wrapper = new QueryWrapper<>();
+        if (pageQueryDTO.getName() != null && !pageQueryDTO.getName().isEmpty()) {
+            wrapper.like("name", "%" + pageQueryDTO.getName() + "%");
+        }
+
+        return employeeMapper.selectPage(page, wrapper);
+    }
+
+    /**
+     * 修改员工状态
+     * @param status
+     * @param id
+     */
+    @Override
+    public void updateStatus(Integer status, Long id) {
+        Employee employee = Employee.builder()
+                .status(status)
+                .id(id)
+                .build();
+        updateById(employee);
+    }
+
     @Override
     public boolean save(Employee entity) {
         System.out.println("当前线程的ID为：" + Thread.currentThread().getId());
@@ -73,4 +113,5 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper,Employee> im
         entity.setUpdateUser(BaseContext.getCurrentId());
         return super.save(entity);
     }
+
 }
