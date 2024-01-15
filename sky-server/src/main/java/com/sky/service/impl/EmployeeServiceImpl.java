@@ -101,6 +101,13 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper,Employee> im
     }
 
     @Override
+    public void updateEmployee(Employee employee) {
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(BaseContext.getCurrentId());
+        employeeMapper.updateById(employee);
+    }
+
+    @Override
     public boolean save(Employee entity) {
         System.out.println("当前线程的ID为：" + Thread.currentThread().getId());
         entity.setStatus(StatusConstant.ENABLE);//设置状态
