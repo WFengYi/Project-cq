@@ -5,11 +5,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.sky.anno.AutoFill;
 import com.sky.constant.JwtClaimsConstant;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
+import com.sky.enumeration.OperationType;
 import com.sky.mapper.EmployeeMapper;
 import com.sky.properties.JwtProperties;
 import com.sky.result.PageResult;
@@ -90,6 +92,7 @@ public class EmployeeController {
      */
     @PostMapping
     @ApiOperation("新增员工")
+    @AutoFill(value = OperationType.INSERT)
     public Result save(@RequestBody EmployeeDTO employeeDTO) {
         System.out.println("当前线程的ID为：" + Thread.currentThread().getId());
         log.info("新增员工：{}", employeeDTO);

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.sky.anno.AutoFill;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
@@ -12,6 +13,7 @@ import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
+import com.sky.enumeration.OperationType;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
 import com.sky.exception.PasswordErrorException;
@@ -92,6 +94,7 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper,Employee> im
      * @param id
      */
     @Override
+    @AutoFill(value = OperationType.UPDATE)
     public void updateStatus(Integer status, Long id) {
         Employee employee = Employee.builder()
                 .status(status)
@@ -101,13 +104,15 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper,Employee> im
     }
 
     @Override
+    @AutoFill(value = OperationType.UPDATE)
     public void updateEmployee(Employee employee) {
-        employee.setUpdateTime(LocalDateTime.now());
-        employee.setUpdateUser(BaseContext.getCurrentId());
+//        employee.setUpdateTime(LocalDateTime.now());
+//        employee.setUpdateUser(BaseContext.getCurrentId());
         employeeMapper.updateById(employee);
     }
 
     @Override
+    @AutoFill(value = OperationType.INSERT)
     public boolean save(Employee entity) {
         System.out.println("当前线程的ID为：" + Thread.currentThread().getId());
         entity.setStatus(StatusConstant.ENABLE);//设置状态
