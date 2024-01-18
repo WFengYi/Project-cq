@@ -26,7 +26,7 @@ import org.springframework.util.DigestUtils;
 import java.time.LocalDateTime;
 
 @Service
-public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper,Employee> implements EmployeeService     {
+public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper,Employee> implements EmployeeService{
 
     @Autowired
     private EmployeeMapper employeeMapper;
