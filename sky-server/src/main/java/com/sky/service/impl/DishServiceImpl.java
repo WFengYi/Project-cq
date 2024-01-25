@@ -9,6 +9,7 @@ import com.github.pagehelper.PageHelper;
 import com.sky.anno.AutoFill;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.StatusConstant;
+import com.sky.context.BaseContext;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
@@ -28,6 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -41,13 +44,9 @@ public class DishServiceImpl extends ServiceImpl<DishMapper,Dish> implements Dis
     private DishMapper dishMapper;
     @Autowired
     private SetmealDishMapper setmealDishMapper;
+    @Autowired
+    private DishFlavorMapper dishFlavorMapper;
 
-
-
-    @Override
-    public void saveDish(DishDTO dishDTO) {
-
-    }
 
     /**
      * 插入
@@ -136,7 +135,6 @@ public class DishServiceImpl extends ServiceImpl<DishMapper,Dish> implements Dis
 
     @Override
     @Transactional
-
     public void updateWithFlavor(Dish dish,DishDTO dishDTO) {
 
 //        UpdateWrapper<Dish> wrapper = new UpdateWrapper<>();
@@ -163,4 +161,42 @@ public class DishServiceImpl extends ServiceImpl<DishMapper,Dish> implements Dis
             flavorMapper.insertBatch(flavors);
         }
     }
+
+    @Override
+    public void updateStatus(Integer status, Long id) {
+        Dish dish = Dish.builder()
+                .status(status)
+                .id(id)
+                .updateTime(LocalDateTime.now())
+                .updateUser(BaseContext.getCurrentId())
+                .build();
+        updateById(dish);
+    }
+
+    /**
+     * 条件查询菜品和口味
+     * @param dish
+     * @return
+     */
+    public List<DishVO> listWithFlavor(Dish dish) {
+        List<Dish> dishList = dishMapper.list(dish);
+
+        List<DishVO> dishVOList = new ArrayList<>();
+
+        for (Dish d : dishList) {
+            DishVO dishVO = new DishVO();
+            BeanUtils.copyProperties(d,dishVO);
+
+            //根据菜品id查询对应的口味
+            QueryWrapper<DishFlavor> wrapper = new QueryWrapper<>();
+            wrapper.eq("dish_id", d.getId());
+            List<DishFlavor> flavors = dishFlavorMapper.selectList(wrapper);
+
+            dishVO.setFlavors(flavors);
+            dishVOList.add(dishVO);
+        }
+
+        return dishVOList;
+    }
+
 }

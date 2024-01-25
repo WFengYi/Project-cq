@@ -12,7 +12,6 @@ import com.sky.vo.DishVO;
 import java.util.List;
 
 public interface DishService extends IService<Dish> {
-    void saveDish(DishDTO dishDTO);
 
     void save(Dish dish,DishDTO dishDTO);
 
@@ -22,6 +21,14 @@ public interface DishService extends IService<Dish> {
 
     DishVO getByIdWithFlavor(Long id);
 
-    @AutoFill(OperationType.UPDATE)
     void updateWithFlavor(Dish dish,DishDTO dishDTO);
+
+    void updateStatus(Integer status, Long id);
+
+    /**
+     * 条件查询菜品和口味
+     * @param dish
+     * @return
+     */
+    List<DishVO> listWithFlavor(Dish dish);
 }

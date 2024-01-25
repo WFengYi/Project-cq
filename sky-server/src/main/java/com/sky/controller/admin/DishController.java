@@ -1,7 +1,9 @@
 package com.sky.controller.admin;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.sky.constant.StatusConstant;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
@@ -81,10 +83,28 @@ public class DishController {
         return Result.success(dishVO);
     }
     @PutMapping
-    @ApiOperation("修改对象接口")
+    @ApiOperation("修改菜品接口")
     public Result updateWithDishFlavor(@RequestBody DishDTO dishDTO){
         Dish dish = BeanUtil.copyProperties(dishDTO, Dish.class);
         dishService.updateWithFlavor(dish,dishDTO);
         return Result.success();
     }
+    @PostMapping("/status/{status}")
+    @ApiOperation("修改菜品状态")
+    public Result startOrBan(@PathVariable("status") Integer status,Long id){
+        log.info("修改菜品状态：{},{}",status,id);
+        dishService.updateStatus(status,id);
+        return Result.success();
+    }
+    @GetMapping("/list")
+    @ApiOperation("根据分类id查询菜品")
+    public Result<List<Dish>> list(Long categoryId){
+        log.info("根据分类id查询菜品：{}",categoryId);
+        QueryWrapper<Dish> wrapper = new QueryWrapper<>();
+        wrapper.eq("category_id",categoryId)
+                        .eq("status", StatusConstant.ENABLE);
+        List<Dish> list = dishService.list(wrapper);
+        return Result.success(list);
+    }
+
 }

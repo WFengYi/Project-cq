@@ -107,7 +107,7 @@ public class EmployeeController {
     @GetMapping("/page")
     @ApiOperation("分页查询员工")
     public Result<PageResult> pageQuery(EmployeePageQueryDTO pageQueryDTO) {
-        log.info("员工分页参数，参数为：{}",pageQueryDTO);
+        log.info("分页查询员工，参数为：{}",pageQueryDTO);
         //分页实现
         IPage<Employee> employeePage = employeeService.pageQuery(pageQueryDTO);
         //赋值

@@ -94,11 +94,12 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper,Employee> im
      * @param id
      */
     @Override
-    @AutoFill(value = OperationType.UPDATE)
     public void updateStatus(Integer status, Long id) {
         Employee employee = Employee.builder()
                 .status(status)
                 .id(id)
+                .updateTime(LocalDateTime.now())
+                .updateUser(BaseContext.getCurrentId())
                 .build();
         updateById(employee);
     }

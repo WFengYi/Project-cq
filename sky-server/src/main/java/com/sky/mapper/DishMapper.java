@@ -10,6 +10,8 @@ import com.sky.vo.DishVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.List;
+
 @Mapper
 public interface DishMapper extends BaseMapper<Dish> {
 
@@ -27,4 +29,5 @@ public interface DishMapper extends BaseMapper<Dish> {
     void updateDish(Dish dish);
 
 
+    List<Dish> list(Dish dish);
 }
