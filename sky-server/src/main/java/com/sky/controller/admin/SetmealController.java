@@ -15,6 +15,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,6 +35,7 @@ public class SetmealController {
      */
     @GetMapping("/page")
     @ApiOperation("分页查询套餐")
+
     public Result<PageResult> pageQuery(SetmealPageQueryDTO pageQueryDTO){
         log.info("套餐分页查询：{}",pageQueryDTO);
         PageResult pageResult =setmealService.pageQuery(pageQueryDTO);
@@ -46,9 +48,10 @@ public class SetmealController {
      * @return
      */
     @PostMapping
-    @ApiOperation("新增菜品")
+    @ApiOperation("新增套餐")
+    @CacheEvict(value = "setmealCache",key = "#setmealCache.categoryId")
     public Result save(@RequestBody SetmealDTO setmealDTO){
-        log.info("新增菜品：{}",setmealDTO);
+        log.info("新增套餐：{}",setmealDTO);
         Setmeal setmeal = BeanUtil.copyProperties(setmealDTO, Setmeal.class);
         setmealService.save(setmeal,setmealDTO);
         return Result.success();
@@ -64,6 +67,7 @@ public class SetmealController {
 
     @PutMapping
     @ApiOperation("修改套餐")
+    @CacheEvict(value = "setmealCache",allEntries = true)//全部缓存 清除
     public Result<Setmeal> update(@RequestBody SetmealDTO setmealDTO){
         log.info("修改套餐：{}",setmealDTO);
         Setmeal setmeal = BeanUtil.copyProperties(setmealDTO, Setmeal.class);
@@ -79,6 +83,7 @@ public class SetmealController {
 //    }
     @PostMapping("/status/{status}")
     @ApiOperation("修改套餐状态")
+    @CacheEvict(value = "setmealCache",allEntries = true)//全部缓存 清除
     public Result startOrBan(@PathVariable("status") Integer status,Long id){
         log.info("修改套餐状态：{},{}",status,id);
         setmealService.updateStatus(status,id);
@@ -87,6 +92,7 @@ public class SetmealController {
 
     @DeleteMapping
     @ApiOperation("删除套餐接口")
+    @CacheEvict(value = "setmealCache",allEntries = true)//全部缓存 清除
     public Result delete(@RequestParam List<Long> ids){
         log.info("删除套餐接口:{}",ids);
         setmealService.removeByCndition(ids);
