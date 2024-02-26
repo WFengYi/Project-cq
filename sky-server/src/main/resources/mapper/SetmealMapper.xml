@@ -25,7 +25,7 @@
         </where>
         order by s.create_time desc
     </select>
-    <select id="list" parameterType="Setmeal" resultType="Setmeal">
+    <select id="list" parameterType="com.sky.entity.Setmeal" resultType="com.sky.entity.Setmeal">
         select * from setmeal
         <where>
             <if test="name != null">
@@ -36,6 +36,17 @@
             </if>
             <if test="status != null">
                 and status = #{status}
+            </if>
+        </where>
+    </select>
+    <select id="countByMap" resultType="java.lang.Integer" parameterType="java.util.Map">
+        select count(id) from dish
+        <where>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="categoryId != null">
+                and category_id = #{categoryId}
             </if>
         </where>
     </select>

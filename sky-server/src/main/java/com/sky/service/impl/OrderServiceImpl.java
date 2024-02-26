@@ -1,6 +1,7 @@
 package com.sky.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -21,6 +22,7 @@ import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import com.sky.websocket.WebSocketServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +52,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
     private WeChatPayUtil weChatPayUtil;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private WebSocketServer webSocketServer;
 
 
     @Override
@@ -162,6 +166,15 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
                 .build();
 
         orderMapper.update(orders);
+        //通过websocket向客户端发送消息 type orderId content
+        //封装成map
+        Map map = new HashMap<>();
+        map.put("type", 1);//1：来单 2：催单
+        map.put("orderId", ordersDB.getId());
+        map.put("content", "订单号：" + outTradeNo);
+        String json = JSON.toJSONString(map);
+
+        webSocketServer.sendToAllClient(json);
 
     }
 
@@ -372,7 +385,20 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
 
     @Override
     public void reminder(Long id) {
+        //通过websocket向客户端发送消息 type orderId content
+        //封装成map
+        Map map = new HashMap<>();
+        map.put("type", 2);//1：来单 2：催单
+        map.put("orderId", id);
+        Orders orders = getById(id);
+        //校验id是否存在
+        if (orders == null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+        map.put("content", "订单号：" + orders.getNumber());
+        String json = JSON.toJSONString(map);
 
+        webSocketServer.sendToAllClient(json);
     }
 
     /**
